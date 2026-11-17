@@ -1,7 +1,7 @@
 # REVIEW.md — independent adversarial review of epochmatch
 
 Reviewer: independent subagent (did not build the tool). Date: 2026-11-17.
-Scope: local work only; nothing published or pushed. All fixes are inside
+Scope: the gauntlet was run locally; at review time nothing had been published or pushed. All fixes are inside
 this directory (`epochmatch/core.py`, `tests/test_epochmatch.py`,
 `README.md`, this file).
 
