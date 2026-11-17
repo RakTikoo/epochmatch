@@ -290,7 +290,8 @@ def match_tables(table_a: Table, table_b: Table, *,
                  epoch_a: float, epoch_b: float, to_epoch: float,
                  radius_arcsec: float,
                  ra_col="ra", dec_col="dec", pmra_col="pmra",
-                 pmdec_col="pmdec", id_a=None, id_b=None) -> MatchResult:
+                 pmdec_col="pmdec", id_a=None, id_b=None,
+                 include_propagated: bool = False) -> MatchResult:
     try:
         radius_arcsec = float(radius_arcsec)
     except (TypeError, ValueError):
@@ -368,10 +369,42 @@ def match_tables(table_a: Table, table_b: Table, *,
             matched_t[k] = v
         for k, v in _key_columns(cat_b, mb, "b").items():
             matched_t[k] = v
+        if include_propagated:
+            # Map table row indices to the order in the propagated SkyCoord
+            # (which only includes finite rows, in the order of a_rows / b_rows)
+            a_row_to_prop = {int(r): i for i, r in enumerate(a_rows)}
+            b_row_to_prop = {int(r): i for i, r in enumerate(b_rows)}
+            ra_a_prop = []
+            dec_a_prop = []
+            ra_b_prop = []
+            dec_b_prop = []
+            for a, b in zip(ma, mb):
+                ia = a_row_to_prop.get(a)
+                ib = b_row_to_prop.get(b)
+                if ia is not None:
+                    ra_a_prop.append(float(prop_a.ra.deg[ia]))
+                    dec_a_prop.append(float(prop_a.dec.deg[ia]))
+                else:
+                    ra_a_prop.append(np.nan)
+                    dec_a_prop.append(np.nan)
+                if ib is not None:
+                    ra_b_prop.append(float(prop_b.ra.deg[ib]))
+                    dec_b_prop.append(float(prop_b.dec.deg[ib]))
+                else:
+                    ra_b_prop.append(np.nan)
+                    dec_b_prop.append(np.nan)
+            matched_t["ra_a_prop_deg"] = ra_a_prop
+            matched_t["dec_a_prop_deg"] = dec_a_prop
+            matched_t["ra_b_prop_deg"] = ra_b_prop
+            matched_t["dec_b_prop_deg"] = dec_b_prop
     else:
-        matched_t = Table(names=["id_a", "id_b", "sep_arcsec",
-                                 "a_ra", "a_dec", "a_pmra", "a_pmdec",
-                                 "b_ra", "b_dec", "b_pmra", "b_pmdec"])
+        names = ["id_a", "id_b", "sep_arcsec",
+                 "a_ra", "a_dec", "a_pmra", "a_pmdec",
+                 "b_ra", "b_dec", "b_pmra", "b_pmdec"]
+        if include_propagated:
+            names += ["ra_a_prop_deg", "dec_a_prop_deg",
+                      "ra_b_prop_deg", "dec_b_prop_deg"]
+        matched_t = Table(names=names)
 
     ambiguous_t = Table()
     if ambiguous:
