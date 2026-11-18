@@ -361,3 +361,61 @@ class TestAdversarialRegressions(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPropagatedColumns(unittest.TestCase):
+    """Optional --propagated-columns / include_propagated adds the
+    positions at the common epoch to the matched output."""
+
+    def test_propagated_matches_hand_computed(self):
+        # One star, known proper motion.  Hand-computed propagation:
+        # from epoch 2000.0 to 2010.0 (dt = 10 yr).
+        # pmra = 100 mas/yr, pmdec = 50 mas/yr.
+        # 100 mas/yr * 10 yr = 1000 mas = 1.0 arcsec = 1/3600 deg
+        # in RA (cosdec correction is already in the pm_ra_cosdec convention
+        # used by the code, but for Dec=0 the factor is 1).
+        # At Dec=0, RA change = (pmra * dt) / 3600 / cos(dec) degrees,
+        # but since pmra is already cosdec, RA_deg change = pmra_mas * dt / 3_600_000.
+        # 100 * 10 / 3_600_000 = 0.000277777... degrees.
+        # Dec change = 50 * 10 / 3_600_000 = 0.000138888... degrees.
+        ra0, dec0 = 150.0, 0.0
+        pmra, pmdec = 100.0, 50.0
+        dt = 10.0
+        expected_ra = ra0 + (pmra * dt) / 3_600_000.0
+        expected_dec = dec0 + (pmdec * dt) / 3_600_000.0
+
+        a = make_table(["S1"], [ra0], [dec0], [pmra], [pmdec])
+        # B is already at the target epoch with the same motion
+        b = make_table(["S1"], [expected_ra], [expected_dec], [pmra], [pmdec])
+
+        result = match_tables(
+            a, b,
+            epoch_a=2000.0, epoch_b=2010.0, to_epoch=2010.0,
+            radius_arcsec=1.0,
+            id_a="id", id_b="id",
+            include_propagated=True,
+        )
+        self.assertEqual(len(result.matched), 1)
+        row = result.matched[0]
+        # A is propagated from 2000 to 2010; B is already at 2010 so its
+        # propagated position is its catalogue position.
+        self.assertAlmostEqual(row["ra_a_prop_deg"], expected_ra, places=10)
+        self.assertAlmostEqual(row["dec_a_prop_deg"], expected_dec, places=10)
+        self.assertAlmostEqual(row["ra_b_prop_deg"], expected_ra, places=10)
+        self.assertAlmostEqual(row["dec_b_prop_deg"], expected_dec, places=10)
+
+    def test_without_flag_columns_absent(self):
+        a = make_table(["S1"], [150.0], [20.0], [100.0], [50.0])
+        b = make_table(["S1"], [150.0], [20.0], [100.0], [50.0])
+        result = match_tables(
+            a, b,
+            epoch_a=2000.0, epoch_b=2000.0, to_epoch=2000.0,
+            radius_arcsec=1.0,
+            id_a="id", id_b="id",
+            include_propagated=False,
+        )
+        self.assertEqual(len(result.matched), 1)
+        self.assertNotIn("ra_a_prop_deg", result.matched.colnames)
+        self.assertNotIn("dec_a_prop_deg", result.matched.colnames)
+        self.assertNotIn("ra_b_prop_deg", result.matched.colnames)
+        self.assertNotIn("dec_b_prop_deg", result.matched.colnames)

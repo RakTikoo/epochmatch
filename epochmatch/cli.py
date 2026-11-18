@@ -43,6 +43,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="ID column in catalogue A (default: row number)")
     p.add_argument("--id-b", default=None,
                    help="ID column in catalogue B (default: row number)")
+    p.add_argument("--propagated-columns", action="store_true",
+                   help="add propagated position columns (ra_a_prop_deg, "
+                        "dec_a_prop_deg, ra_b_prop_deg, dec_b_prop_deg) "
+                        "to the matched output, at the common epoch")
     return p
 
 
@@ -60,7 +64,8 @@ def main(argv=None) -> int:
             to_epoch=to_epoch, radius_arcsec=args.radius,
             ra_col=args.ra_col, dec_col=args.dec_col,
             pmra_col=args.pmra_col, pmdec_col=args.pmdec_col,
-            id_a=args.id_a, id_b=args.id_b)
+            id_a=args.id_a, id_b=args.id_b,
+            include_propagated=args.propagated_columns)
         outputs = {
             "matched": result.matched,
             "unmatched_a": result.unmatched_a,

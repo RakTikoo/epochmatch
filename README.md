@@ -48,6 +48,7 @@ $ epochmatch A.csv B.fits --epoch-a 2000.0 --epoch-b 2015.5 --to-epoch 2016.0 --
 - Inputs can be CSV, VOTable or FITS tables (anything `astropy.table` reads), mixed freely.
 - Columns: `ra`, `dec` in degrees; `pmra`, `pmdec` in mas/yr, using the `pm_ra_cosdec` convention (as in Gaia). Rename any of them with `--ra-col`, `--dec-col`, `--pmra-col`, `--pmdec-col`.
 - `--id-a` / `--id-b` name an ID column per catalogue. Without one, the ID is the row number (0-based).
+- `--propagated-columns` adds the propagated position of each side at the common epoch to the matched output (`ra_a_prop_deg`, `dec_a_prop_deg`, `ra_b_prop_deg`, `dec_b_prop_deg`). Default behaviour is unchanged when the flag is omitted.
 - `--to-epoch` defaults to the later of the two epochs.
 - If a catalogue has no proper-motion columns, its positions are matched as-is and a clear warning is printed — the match for that side is static, and the summary never hides that.
 - Rows with missing or non-finite coordinates or proper motions cannot match; they are counted in a warning and reported as unmatched. Masked/null values (as in Gaia-style FITS and VOTable files) count as missing — the mask is honoured, never silently dropped.
@@ -81,7 +82,7 @@ Honest list:
 - **Not built for billion-row surveys.** Matching is a KD-tree over both catalogues in memory — comfortable for thousands to millions of rows, not a Gaia-scale join. For that, use a partitioned tool such as LSDB.
 - **Dense fields grow quadratically in the output.** If N stars on each side all fall inside one match radius, the ambiguous file gets N×N candidate rows — that is the honest answer, but it is big. (Measured: a 300×300 fully coincident field finishes in about a second; a sparse 20,000×20,000 match takes about 2 seconds.)
 - **Extreme proper motions are model-sensitive.** Propagation is exact linear space motion (via Astropy/ERFA). A constant-angular-rate approximation differs from it by ~0.3 arcsec at |pm| ≈ 100,000 mas/yr over a 16-year baseline — but no known star moves that fast (Barnard's star, the fastest, is ~10,300 mas/yr, where the difference is ~0.003 arcsec), so this does not affect real catalogues.
-- Separations are computed at the common epoch; the coordinate columns in the outputs are the original catalogue values, not the propagated ones. For a catalogue without proper-motion columns, the proper-motion columns in the matched output are NaN rather than a fabricated 0.0.
+- Separations are computed at the common epoch; by default the coordinate columns in the outputs are the original catalogue values, not the propagated ones. Pass `--propagated-columns` to also write the propagated positions (at the common epoch) as `ra_a_prop_deg`, `dec_a_prop_deg`, `ra_b_prop_deg` and `dec_b_prop_deg` in the matched output. For a catalogue without proper-motion columns, the proper-motion columns in the matched output are NaN rather than a fabricated 0.0.
 
 ## Tests
 
