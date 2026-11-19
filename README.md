@@ -92,6 +92,14 @@ $ python3 run_tests.py
 
 22 tests, including: proper-motion stars a static match provably misses but epochmatch recovers; zero-motion agreement with a plain `SkyCoord` match; ambiguous pairs; missing proper-motion columns; empty catalogues; NaN coordinates; duplicate positions; radius 0; CLI error handling (one clean line, no traceback); and the adversarial regressions from `REVIEW.md` — NaN/masked proper motions, masked coordinates, non-finite radius and epochs, a pair exactly at the radius, radii above 180 degrees, a B row claimed by both an ambiguous and a single-candidate A row, and out-of-range Dec.
 
+## Use with an AI agent
+
+This repo ships a [SKILL.md](SKILL.md) written to the Agent Skills open
+standard. If your coding agent supports skills, point it at this repo and
+it can install epochmatch, run it on your catalogues, and read the results
+for you. The skill works as documented when the repo is cloned under its
+real name (`epochmatch`) — the standard matches a skill to its folder name.
+
 ## License
 
 MIT — see `LICENSE`.
