@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - name: RakTikoo
+title: "epochmatch: cross-match star catalogues from different epochs with proper-motion propagation"
+version: 0.1.0
+date-released: 2026-11-17
+license: MIT
+url: "https://github.com/RakTikoo/epochmatch"
+repository-code: "https://github.com/RakTikoo/epochmatch"
+abstract: >-
+  Cross-matches two star catalogues measured at different epochs (CSV,
+  VOTable or FITS tables) by propagating positions to a common epoch with
+  proper motions before matching, and reports matched, unmatched and
+  ambiguous pairs.
+keywords:
+  - astronomy
+  - cross-match
+  - proper motion
+  - catalogue

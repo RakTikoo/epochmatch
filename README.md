@@ -1,8 +1,10 @@
-# epochmatch
+# epochmatch — cross-match star catalogues from different epochs
 
 **Cross-match two star catalogues from different epochs — positions are moved to a common epoch with proper motions first, so stars that moved still match.**
 
 Matching two catalogues by raw position only works if both were measured at the same time. They usually were not: a star with a proper motion of 400 mas/yr sits ~6 arcsec away from its year-2000 position by 2016, far outside a normal 1–2 arcsec match radius. The usual matchers treat the sky as frozen, so movers silently mismatch or vanish. epochmatch propagates both catalogues to one shared epoch before matching, and tells you plainly which pairs matched, which did not, and which were too close to call.
+
+**Quick install:** `pip install git+https://github.com/RakTikoo/epochmatch` (Python 3.10+; Astropy, NumPy and SciPy). Details under [Install](#install).
 
 ## Demo
 

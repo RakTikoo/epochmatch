@@ -1,6 +1,6 @@
 ---
 name: epochmatch
-description: Cross-match two star catalogues measured at different epochs (CSV, VOTable or FITS tables), propagating positions to a common epoch with proper motions (pmra, pmdec) before matching, so stars that moved still match. Use when asked to cross-match, join or compare two catalogues from different years or epochs, match a catalogue against Gaia, or find counterparts for stars with proper motion.
+description: Cross-match two star catalogues measured at different epochs (CSV, VOTable or FITS tables), propagating positions to a common epoch with proper motions (pmra, pmdec) before matching, so stars that moved still match. Use when asked to cross-match, join or compare two catalogues from different years or epochs, match a catalogue against Gaia, or find counterparts for stars with proper motion. Not for barycentric time conversion (use bjd), FITS header audits (use fitslog), planning tonight's observing (use tonight), or FITS contact sheets (use fitspeek).
 license: MIT
 compatibility: Requires Python 3.10+ with Astropy, NumPy and SciPy. Installing needs network access to GitHub; the tool itself runs fully offline.
 ---
